@@ -1,0 +1,13 @@
+# backend/requirements.txt
+fastapi
+uvicorn
+yt-dlp
+ffmpeg-python
+faster-whisper
+spacy
+googletrans==4.0.0-rc1
+indic-transliteration
+requests
+python-dotenv
+deta
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0.tar.gz

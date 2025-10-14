@@ -1,4 +1,3 @@
-# यह पूरा कोड backend/main.py में डालें
 import os
 import uuid
 import time
@@ -33,23 +32,17 @@ whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
 nlp = spacy.load("en_core_web_sm")
 translator = Translator()
 
+# YOUR DEEPSEEK API KEY - REPLACE WITH YOUR KEY
+DEEPSEEK_API_KEY = "sk-f0167ce1d08a45feabdd6f4f6cbd595f"
+
 LLM_PROVIDERS = [
     {
         "name": "deepseek",
         "url": "https://api.deepseek.com/v1/chat/completions",
-        "headers": {"Authorization": f"Bearer {os.getenv('DEEPSEEK_API_KEY')}"},
+        "headers": {"Authorization": f"Bearer {DEEPSEEK_API_KEY}"},
         "prompts": {
             "translation": "Translate to accurate Hindi: {text}",
             "pronunciation": "Convert to Hindi phonetic (Devanagari): {text}"
-        }
-    },
-    {
-        "name": "huggingface",
-        "url": "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta",
-        "headers": {"Authorization": f"Bearer {os.getenv('HF_API_KEY')}"},
-        "prompts": {
-            "translation": "<|system|>Translate English to Hindi</s><|user|>{text}</s>",
-            "pronunciation": "<|system|>Convert to Hindi pronunciation</s><|user|>{text}</s>"
         }
     }
 ]
@@ -122,17 +115,14 @@ def translate_sentence(text: str) -> str:
                 response = requests.post(
                     provider['url'],
                     headers=provider.get('headers', {}),
-                    json={"inputs": prompt} if "huggingface" in provider['url'] else {
-                        "model": provider.get('model', ''),
+                    json={
+                        "model": "deepseek-chat",
                         "messages": [{"role": "user", "content": prompt}],
                         "max_tokens": 200
                     },
                     timeout=15
                 )
-                if "huggingface" in provider['url']:
-                    return response.json()[0]['generated_text']
-                else:
-                    return response.json()["choices"][0]["message"]["content"]
+                return response.json()["choices"][0]["message"]["content"]
             except:
                 continue
         return "Translation unavailable"
@@ -144,17 +134,14 @@ def generate_pronunciation(text: str) -> str:
             response = requests.post(
                 provider['url'],
                 headers=provider.get('headers', {}),
-                json={"inputs": prompt} if "huggingface" in provider['url'] else {
-                    "model": provider.get('model', ''),
+                json={
+                    "model": "deepseek-chat",
                     "messages": [{"role": "user", "content": prompt}],
                     "max_tokens": 200
                 },
                 timeout=15
             )
-            if "huggingface" in provider['url']:
-                return response.json()[0]['generated_text']
-            else:
-                return response.json()["choices"][0]["message"]["content"]
+            return response.json()["choices"][0]["message"]["content"]
         except:
             continue
     

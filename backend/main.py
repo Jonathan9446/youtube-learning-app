@@ -5,6 +5,7 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import yt_dlp
 import ffmpeg
@@ -32,7 +33,6 @@ whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
 nlp = spacy.load("en_core_web_sm")
 translator = Translator()
 
-# YOUR DEEPSEEK API KEY - REPLACE WITH YOUR KEY
 DEEPSEEK_API_KEY = "sk-f0167ce1d08a45feabdd6f4f6cbd595f"
 
 LLM_PROVIDERS = [
@@ -231,6 +231,4 @@ async def get_transcript(task_id: str, last_key: str = None):
         "last_key": res.last
     }
 
-@app.get("/")
-async def root():
-    return {"message": "YouTube Learning API is running"}
+app.mount("/", StaticFiles(directory="public", html=True), name="static")
